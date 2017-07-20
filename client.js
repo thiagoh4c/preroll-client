@@ -41,15 +41,17 @@ socket.on('connect', function (socket) {
     sendToServer('whoiam', config.hostname);
 });
 
+tails = [];
+
 socket.on('logs', function (data) {
     console.log('get log!', data);
 
     (function(dataDb){
 			fs.stat(dataDb.filename, function(err, stat){
 				if(err == null){
-					var tail = new Tail(dataDb.filename);
+					tails[dataDb.filename] = new Tail(dataDb.filename);
 					console.log('tail :', dataDb.filename, dataDb.mountpoint);
-					tail.on('line', function(data){
+					tails[dataDb.filename].on('line', function(data){
 						match = data.match(/^(\S+) \S+ \S+ \[(.*?)\] "(.+).*?" \d+ \d+ "(.*?)" "(.*?)" ([0-9]+)/);
 						if (match){
 							info = [];
