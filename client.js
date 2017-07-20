@@ -29,11 +29,11 @@ app.post("/upload", function(req, res){
 	});
 });
 
-http.listen(7000, function () {
-  console.log('listening on *:8080');
+http.listen(7001, function () {
+  console.log('listening on *:7001');
 });
 
-var socket = io.connect('http://localhost:8081', {reconnect: true});
+var socket = io.connect('http://preroll.crosshost.com.br:7001', {reconnect: true});
 
 // Add a connect listener
 socket.on('connect', function (socket) {
