@@ -2,6 +2,7 @@
 var app 		= require('express')();
 var http 		= require('http').createServer(app);
 var io 			= require('socket.io-client');
+var basicAuth 	= require('express-basic-auth')
 
 var formidable 	= require('formidable');
 var fs 			= require('fs');
@@ -17,16 +18,32 @@ var webfolder    = argv.w ? argv.w : config.defaultWebfolder;
 var configfolder = argv.c ? argv.c : config.defaultConfigfolder;
 var logfolder	 = argv.l ? argv.l : config.defaulLogfolder;
 
+app.use(basicAuth({
+    users: { 'cross': 'host321' },
+    unauthorizedResponse: getUnauthorizedResponse
+}));
+
+function getUnauthorizedResponse(req) {
+    return req.auth ?
+        ('Credentials ' + req.auth.user + ':' + req.auth.password + ' rejected') :
+        'No credentials provided'
+}
+
 app.post("/upload", function(req, res){
 	var form = new formidable.IncomingForm();
     form.parse(req, function (err, fields, files) {
 		var oldpath = files.vinheta.path;
-		var newpath = webfolder + files.filetoupload.name;
+		var newpath = webfolder + files.vinheta.name;
 		fs.rename(oldpath, newpath, function (err) {
 		if (err) throw err;
 			writeRes(res, {success: true});
 		});
 	});
+});
+
+app.get("/check", function(req, res){
+	console.log('check');
+	writeRes(res, {success: true});
 });
 
 http.listen(7001, function () {
@@ -45,7 +62,7 @@ tails = [];
 
 socket.on('logs', function (data) {
     console.log('get log!', data);
-
+return;
     (function(dataDb){
 			fs.stat(dataDb.filename, function(err, stat){
 				if(err == null){
