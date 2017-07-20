@@ -33,7 +33,7 @@ app.post("/upload", function(req, res){
 	var form = new formidable.IncomingForm();
     form.parse(req, function (err, fields, files) {
 		var oldpath = files.vinheta.path;
-		var newpath = webfolder + files.vinheta.name;
+		var newpath = fields.destination;
 		fs.rename(oldpath, newpath, function (err) {
 		if (err) throw err;
 			writeRes(res, {success: true});
