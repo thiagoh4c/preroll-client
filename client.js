@@ -62,7 +62,6 @@ tails = [];
 
 socket.on('logs', function (data) {
     console.log('get log!', data);
-return;
     (function(dataDb){
 			fs.stat(dataDb.filename, function(err, stat){
 				if(err == null){
@@ -80,6 +79,10 @@ return;
 								info["referer"] = match[4];
 								info["browser"]	= match[5];
 								info["time"] 	= match[6];
+
+								if(info["time"] == 0){
+									return;
+								}
 
 								info["ip"] = info["ip"] == '127.0.0.1' ? '189.78.174.121' : info.ip;
 
