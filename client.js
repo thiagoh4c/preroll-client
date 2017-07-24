@@ -37,6 +37,7 @@ app.post("/upload", function(req, res){
 		fs.rename(oldpath, newpath, function (err) {
 		if (err) throw err;
 			writeRes(res, {success: true});
+			fs.chmodSync(newpath, '777');
 		});
 	});
 });
