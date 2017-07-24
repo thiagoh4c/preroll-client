@@ -134,3 +134,8 @@ writeRes = function(res, data){
 	res.write(JSON.stringify(data));
 	res.end();
 }
+
+
+process.on('uncaughtException', function(err) {
+  console.log('Caught exception: ' + err);
+});
