@@ -11,6 +11,8 @@ var Tail   		= require('tail').Tail;
 var moment		= require('moment');
 var wget  		= require('node-wget');
 var config 		= require('./config');
+var exec  		= require('childprocess').exec
+    
 
 var argv = require('minimist')(process.argv.slice(2));
 
@@ -34,11 +36,23 @@ app.post("/upload", function(req, res){
     form.parse(req, function (err, fields, files) {
 		var oldpath = files.vinheta.path;
 		var newpath = fields.destination;
-		fs.rename(oldpath, newpath, function (err) {
-		if (err) throw err;
-			writeRes(res, {success: true, file: newpath});
-			fs.chmodSync(newpath, '777');
-		});
+
+		child = exec('cp '+oldpath+' '+newpath,
+	        function (error, stdout, stderr) {
+	            console.log('stdout: ' + stdout);
+	            console.log('stderr: ' + stderr);
+	            if (error !== null) {
+	               console.log('exec error: ' + error);
+	            }
+	            writeRes(res, {success: true, file: newpath});
+				fs.chmodSync(newpath, '777');
+	    });
+
+		// fs.rename(oldpath, newpath, function (err) {
+		// if (err) throw err;
+		// 	writeRes(res, {success: true, file: newpath});
+		// 	fs.chmodSync(newpath, '777');
+		// });
 	});
 });
 
