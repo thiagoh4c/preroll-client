@@ -11,7 +11,7 @@ var Tail   		= require('tail').Tail;
 var moment		= require('moment');
 var wget  		= require('node-wget');
 var config 		= require('./config');
-var exec  		= require('childprocess').exec
+var exec  		= require('child_process').exec;
     
 
 var argv = require('minimist')(process.argv.slice(2));
@@ -45,7 +45,7 @@ app.post("/upload", function(req, res){
 	               console.log('exec error: ' + error);
 	            }
 	            writeRes(res, {success: true, file: newpath});
-				fs.chmodSync(newpath, '777');
+				//fs.chmodSync(newpath, '777');
 	    });
 
 		// fs.rename(oldpath, newpath, function (err) {
