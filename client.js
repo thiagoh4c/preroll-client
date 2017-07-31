@@ -151,7 +151,13 @@ function monitoring(stream, port){
 				    } else {
 				      console.log("The file was saved!");
 				      fs.writeFileSync('changed-configfile-'+port+'.txt', moment().unix());
-				      fs.writeFileSync(stream.pathweb+'cron-configfile.txt', stream.configfile);
+				      fs.writeFile(stream.pathweb+'cron-configfile.txt', stream.configfile, function(err){
+				      	if(err){
+				      		console.log('error to create ', stream.pathweb+'cron-configfile.txt');
+				      	}else{
+				      		console.log('created ', stream.pathweb+'cron-configfile.txt');
+				      	}
+				      });
 				    }
 				  }
 				); 
