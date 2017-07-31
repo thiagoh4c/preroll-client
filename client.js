@@ -127,7 +127,11 @@ function monitoring(stream, port){
 			if(mod){
 				doc = new xmldom().parseFromString(fs.readFileSync(stream.configfile).toString(), 'application/xml');
 				mount = doc.getElementsByTagName('mount');
-				console.log(mount[0].firstChild.nodeValue);
+				mountname = mount[0].getElementsByTagName('mount-name');
+
+				if(mountname){
+					mount[0].removeChild(mountname);
+				}
 				audio = mount[0].getElementsByTagName('intro');
 				if(audio.length>0){
 					audio[0].text = port+".audio";
@@ -138,6 +142,7 @@ function monitoring(stream, port){
 					newEle.appendChild(newText);
 					mount[0].appendChild(newEle);
 				}
+				mount[0].setAttribute('type', 'default');
 				
 				console.info('new node', mount[0].firstChild.nodeValue);
 				console.info('doc after change', serializer.serializeToString(doc));
