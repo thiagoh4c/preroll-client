@@ -18,8 +18,10 @@
     "minimist": "^1.2.0",
     "moment": "^2.18.1",
     "node-wget": "^0.4.2",
+    "ps-node": "^0.1.6",
     "socket.io": "^2.0.3",
     "socket.io-client": "^2.0.3",
-    "tail": "^1.2.2"
+    "tail": "^1.2.2",
+    "xmldom": "^0.1.27"
   }
 }

@@ -4,14 +4,18 @@ var http 		= require('http').createServer(app);
 var io 			= require('socket.io-client');
 var basicAuth 	= require('express-basic-auth')
 
-var formidable 	= require('formidable');
-var fs 			= require('fs');
-var glob 		= require('glob');
-var Tail   		= require('tail').Tail;
-var moment		= require('moment');
-var wget  		= require('node-wget');
-var config 		= require('./config');
-var exec  		= require('child_process').exec;
+var formidable 	  = require('formidable');
+var fs 			  = require('fs');
+var glob 		  = require('glob');
+var Tail   		  = require('tail').Tail;
+var moment		  = require('moment');
+var wget  		  = require('node-wget');
+var config 		  = require('./config');
+var exec  		  = require('child_process').exec;
+var xmldom 		  = require('xmldom').DOMParser;
+var XMLSerializer = require('xmldom').XMLSerializer;
+var serializer    = new XMLSerializer();
+var ps 			  = require('ps-node');
     
 
 var argv = require('minimist')(process.argv.slice(2));
@@ -74,6 +78,114 @@ socket.on('connect', function (socket) {
 });
 
 tails = [];
+
+socket.on('setupcc', function (res) {
+	console.log(res);
+	var port = res.stream.url_stream.split(':');
+	port = port[port.length-1];
+	console.log(res.stream.pathweb+port+".audio");
+	fs.stat(res.stream.pathweb+port+".audio", function(err, stat){
+		//if(err){
+			console.log('settuping cc');
+
+			fs.writeFile(res.stream.pathweb+port+".audio", res.audio, function(err) {
+			    console.log('created '+res.stream.pathweb+port+".audio");
+
+				monitoring(res.stream, port);
+			});
+		// }else{
+		// 	console.log('already setuped');
+		// }
+	});
+});
+var monitors = [];
+
+function monitoring(stream, port){
+	monitors[port] = setInterval(function(){
+		console.log('monitoring '+port);
+		fs.stat('changed-configfile-'+port+'.txt', function(errt, statt){
+			if(!errt){
+				var changed = fs.readFileSync('changed-configfile-'+port+'.txt');
+				changed = changed.toString();
+				console.log(changed);
+			}else{
+				changed = 0;
+			}
+
+			mod = false;
+
+			if(filechanged = fs.statSync(stream.configfile).mtime.getTime()){
+				console.log(Math.floor(filechanged/1000), Number(changed));
+				if(Math.floor(filechanged/1000) > Number(changed)){
+					console.log('foi modficado');
+					mod = true;
+				}else{
+					console.log("arquivo atualizado");
+				}
+			}
+
+			if(mod){
+				doc = new xmldom().parseFromString(fs.readFileSync(stream.configfile).toString(), 'application/xml');
+				mount = doc.getElementsByTagName('mount');
+				console.log(mount[0].firstChild.nodeValue);
+				audio = mount[0].getElementsByTagName('intro');
+				if(audio.length>0){
+					audio[0].text = port+".audio";
+					audio[0].nodeValue = port+".audio";
+				}else{
+					newEle = doc.createElement("intro");
+					newText = doc.createTextNode(port+".audio");
+					newEle.appendChild(newText);
+					mount[0].appendChild(newEle);
+				}
+				
+				console.info('new node', mount[0].firstChild.nodeValue);
+				console.info('doc after change', serializer.serializeToString(doc));
+
+				fs.writeFile(
+				  stream.configfile, 
+				  serializer.serializeToString(doc), 
+				  function(error) {
+				    if (error) {
+				      console.log(error);
+				    } else {
+				      console.log("The file was saved!");
+				      fs.writeFileSync('changed-configfile-'+port+'.txt', moment().unix());
+				      fs.writeFileSync('cron-configfile.txt', stream.configfile);
+				    }
+				  }
+				); 
+
+				ps.lookup({
+				    command: 'icecast',
+				    psargs: '-aux',
+				    arguments: stream.configfile
+				    }, function(err, resultList ) {
+				    if (err) {
+				        throw new Error( err );
+				    }
+				    resultList.forEach(function( process ){
+				        if( process ){
+				            console.log( 'PID: %s', process.pid );
+				            ps.kill( process.pid, function( err ) {
+							    if (err) {
+							        throw new Error( err );
+							    }
+							    else {
+							        console.log('create file for crontab');
+							    }
+							});
+				        }
+				    });
+				});
+	 		}
+	
+			
+			
+		});
+	}, 5000);
+	console.log('start monitoring '+port);
+}
 
 socket.on('logs', function (data) {
     console.log('get log!', data);
