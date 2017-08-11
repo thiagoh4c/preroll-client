@@ -236,6 +236,7 @@ socket.on('logs', function (data) {
 										date: 	  info["date"],
 										time:     info["time"],
 										referer:  info["referer"],
+										browser:  info["browser"],
 										resultIP: result
 									};
 									console.log('info', res);
