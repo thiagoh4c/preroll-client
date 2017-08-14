@@ -243,8 +243,6 @@ socket.on('logs', function (data) {
 
 									sendToServer('dataLog', res);
 								});
-							}else{
-								console.log(dataDb, ' not valid', match[3]);
 							}
 						}				
 					});
