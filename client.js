@@ -200,9 +200,14 @@ function monitoring(stream, port){
 
 socket.on('logs', function (data) {
     console.log('get log!', data);
+    console.log('tails', tails.length);		
     (function(dataDb){
 			fs.stat(dataDb.filename, function(err, stat){
 				if(err == null){
+					if(typeof tails[dataDb.filename] != 'undefined'){
+						tails[dataDb.filename].unwatch();
+						delete tails[dataDb.filename];
+					}
 					tails[dataDb.filename] = new Tail(dataDb.filename);
 					console.log('tail :', dataDb.filename, dataDb.mountpoint);
 					tails[dataDb.filename].on('line', function(data){
@@ -218,7 +223,7 @@ socket.on('logs', function (data) {
 								info["browser"]	= match[5];
 								info["time"] 	= match[6];
 
-								if(info["time"] == 0){
+								if(info["time"] <= 10){
 									return;
 								}
 
