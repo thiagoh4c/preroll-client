@@ -229,25 +229,27 @@ socket.on('logs', function (data) {
 
 								info["ip"] = info["ip"] == '127.0.0.1' ? '189.78.174.121' : info.ip;
 
-								wget({
-										url:  'http://preroll.crosshost.com.br/api/lookup-ip?ip='+info["ip"],
-										dest: '/tmp/'
-									}, function(error, response, body){
-									var result = JSON.parse(body);
+								(function(infoo, dd){
+									wget({
+											url:  'http://preroll.crosshost.com.br/api/lookup-ip?ip='+infoo["ip"],
+											dest: '/tmp/'
+										}, function(error, response, body){
+										var result = JSON.parse(body);
 
-									var res = {
-										id: 	  dataDb.id, 
-										ip: 	  info["ip"],
-										date: 	  info["date"],
-										time:     info["time"],
-										referer:  info["referer"],
-										browser:  info["browser"],
-										resultIP: result
-									};
-									console.log('info', res);
+										var res = {
+											id: 	  dd.id, 
+											ip: 	  infoo["ip"],
+											date: 	  infoo["date"],
+											time:     infoo["time"],
+											referer:  infoo["referer"],
+											browser:  infoo["browser"],
+											resultIP: result
+										};
+										console.log('info', res);
 
-									sendToServer('dataLog', res);
-								});
+										sendToServer('dataLog', res);
+									});
+								})(info, dataDb);
 							}
 						}				
 					});
