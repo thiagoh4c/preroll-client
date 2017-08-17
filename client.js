@@ -217,7 +217,7 @@ socket.on('logs', function (data) {
 							if(match[3].indexOf(dataDb.mountpoint) != -1){
 
 								info.ip		= match[1];
-								info["date"] 	= isoDate(match[2]);
+								info["date"] 	= isoDate(match[2], match[6]);
 								info["method"]	= match[3];
 								info["referer"] = match[4];
 								info["browser"]	= match[5];
@@ -263,12 +263,12 @@ sendToServer = function(action, data){
 }
 
 
-isoDate = function(date) {
+isoDate = function(date, sub) {
     if (!date) {
         return null
     }
     date = moment(date, 'DD/MMM/YYYY:HH:mm:ss Z');
-    return  date.format('YYYY-MM-DD HH:mm:ss');
+    return  date.subtract(sub, 'seconds').format('YYYY-MM-DD HH:mm:ss');
 }
 
 writeRes = function(res, data){
