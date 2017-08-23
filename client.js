@@ -33,7 +33,6 @@ setTimeout(function(){
 a = exec('ulimit -n',
   function (error, stdout, stderr) {
     console.log('stdout: ' + stdout); 
-    throw new Error('An error occurred');
   });
 }, 5000);
 
