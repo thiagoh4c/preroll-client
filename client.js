@@ -19,7 +19,7 @@ var ps 			  = require('ps-node');
 var nodemailer 	  = require('nodemailer');
 var nl2br 	  	  = require('nl2br');
 
-let transporter = nodemailer.createTransport({
+var transporter = nodemailer.createTransport({
     host: 'partner1.crosshost.com.br',
     port: 465,
     secure: true,
