@@ -307,7 +307,7 @@ process.on('uncaughtException', function(err) {
 
 function sendMailLog(err){
 
-	let mailOptions = {
+	var mailOptions = {
 	    from: '"Logger 👻" <log@crosshost.com.br>', 
 	    to: 'thiago.h4c@gmail.com', 
 	    subject: 'Error on ['+config.hostname+']', 
