@@ -16,7 +16,14 @@ var xmldom 		  = require('xmldom').DOMParser;
 var XMLSerializer = require('xmldom').XMLSerializer;
 var serializer    = new XMLSerializer();
 var ps 			  = require('ps-node');
-    
+ 
+
+setTimeout(function(){
+a = exec('ulimit -n',
+  function (error, stdout, stderr) {
+    console.log('stdout: ' + stdout);
+  });
+}, 5000);
 
 var argv = require('minimist')(process.argv.slice(2));
 
@@ -280,5 +287,6 @@ writeRes = function(res, data){
 
 
 process.on('uncaughtException', function(err) {
-  console.log('Caught exception: ' + err);
+  console.log('Caught exception: ' + err.stack);
+  console.log("tails.length: ", tails.length);
 });
