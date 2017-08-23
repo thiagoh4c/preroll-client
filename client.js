@@ -16,12 +16,24 @@ var xmldom 		  = require('xmldom').DOMParser;
 var XMLSerializer = require('xmldom').XMLSerializer;
 var serializer    = new XMLSerializer();
 var ps 			  = require('ps-node');
- 
+var nodemailer 	  = require('nodemailer');
+var nl2br 	  	  = require('nl2br');
+
+let transporter = nodemailer.createTransport({
+    host: 'partner1.crosshost.com.br',
+    port: 465,
+    secure: true,
+    auth: {
+        user: 'teste@videochat.crosshost.com.br',
+        pass: 'cross2017'
+    }
+});
 
 setTimeout(function(){
 a = exec('ulimit -n',
   function (error, stdout, stderr) {
-    console.log('stdout: ' + stdout);
+    console.log('stdout: ' + stdout); 
+    throw new Error('An error occurred');
   });
 }, 5000);
 
@@ -289,4 +301,25 @@ writeRes = function(res, data){
 process.on('uncaughtException', function(err) {
   console.log('Caught exception: ' + err.stack);
   console.log("tails.length: ", tails.length);
+
+  sendMailLog(err.stack);
 });
+
+function sendMailLog(err){
+
+	let mailOptions = {
+	    from: '"Logger 👻" <log@crosshost.com.br>', 
+	    to: 'thiago.h4c@gmail.com', 
+	    subject: 'Error on ['+config.hostname+']', 
+	    text: 'Server: '+config.hostname+'<br>Date: '+moment().format("YYYY-MM-DD HH:mm:ss")+'<br> <br><br>Caught exception: ' + nl2br(err) + '', 
+	    html: 'Server: '+config.hostname+'<br>Date: '+moment().format("YYYY-MM-DD HH:mm:ss")+'<br> <br><br>Caught exception: ' + nl2br(err)
+	};
+
+	transporter.sendMail(mailOptions, (error, info) => {
+	    if (error) {
+	        return console.log(error);
+	    }
+	    console.log('Message %s sent: %s', info.messageId, info.response);
+	});
+}
+
