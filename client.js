@@ -29,13 +29,6 @@ var transporter = nodemailer.createTransport({
     }
 });
 
-setTimeout(function(){
-a = exec('ulimit -n',
-  function (error, stdout, stderr) {
-    console.log('stdout: ' + stdout); 
-  });
-}, 5000);
-
 var argv = require('minimist')(process.argv.slice(2));
 
 var webfolder    = argv.w ? argv.w : config.defaultWebfolder;
@@ -59,8 +52,7 @@ app.post("/upload", function(req, res){
 		var oldpath = files.vinheta.path;
 		var newpath = fields.destination;
 
-		child = exec('cp '+oldpath+' '+newpath,
-	        function (error, stdout, stderr) {
+		child = exec('cp '+oldpath+' '+newpath, function (error, stdout, stderr) {
 	            console.log('stdout: ' + stdout);
 	            console.log('stderr: ' + stderr);
 	            if (error !== null) {
@@ -69,12 +61,6 @@ app.post("/upload", function(req, res){
 	            writeRes(res, {success: true, file: newpath});
 				//fs.chmodSync(newpath, '777');
 	    });
-
-		// fs.rename(oldpath, newpath, function (err) {
-		// if (err) throw err;
-		// 	writeRes(res, {success: true, file: newpath});
-		// 	fs.chmodSync(newpath, '777');
-		// });
 	});
 });
 
@@ -247,27 +233,20 @@ socket.on('logs', function (data) {
 
 								info["ip"] = info["ip"] == '127.0.0.1' ? '189.78.174.121' : info.ip;
 
-								(function(infoo, dd){
-									wget({
-											url:  'http://preroll.crosshost.com.br/api/lookup-ip?ip='+infoo["ip"],
-											dest: '/tmp/'
-										}, function(error, response, body){
-										var result = JSON.parse(body);
 
-										var res = {
-											id: 	  dd.id, 
-											ip: 	  infoo["ip"],
-											date: 	  infoo["date"],
-											time:     infoo["time"],
-											referer:  infoo["referer"],
-											browser:  infoo["browser"],
-											resultIP: result
-										};
-										console.log('info', res);
+								var res = {
+									id: 	  dataDb.id, 
+									ip: 	  info["ip"],
+									date: 	  info["date"],
+									time:     info["time"],
+									referer:  info["referer"],
+									browser:  info["browser"]
+								};
+								console.log('info', res);
 
-										sendToServer('dataLog', res);
-									});
-								})(info, dataDb);
+								sendToServer('dataLog', res);
+
+								
 							}
 						}				
 					});
@@ -286,7 +265,7 @@ isoDate = function(date, sub) {
         return null
     }
     date = moment(date, 'DD/MMM/YYYY:HH:mm:ss Z');
-    return  date.subtract(sub, 'seconds').format('YYYY-MM-DD HH:mm:ss');
+    return date.subtract(sub, 'seconds').format('YYYY-MM-DD HH:mm:ss');
 }
 
 writeRes = function(res, data){
