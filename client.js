@@ -57,7 +57,15 @@ app.post("/upload", function(req, res){
 	            console.log('stderr: ' + stderr);
 	            if (error !== null) {
 	               console.log('exec error: ' + error);
+
+	            	writeRes(res, {success: true, error: error, stdout: stdout, stderr: stderr});
+	            	return;
 	            }
+
+		fs.stat(newpath, function(errt, statt){
+			
+			console.log(statt);
+		});
 	            writeRes(res, {success: true, file: newpath});
 				//fs.chmodSync(newpath, '777');
 	    });
@@ -147,6 +155,28 @@ function monitoring(stream, port){
 					mount[0].appendChild(newEle);
 				}
 				mount[0].setAttribute('type', 'default');
+
+				security = doc.getElementsByTagName('security');
+				icecast = doc.getElementsByTagName('icecast');
+				
+				if(security.length==0){
+					newSec = doc.createElement("security");
+					newCh = doc.createElement("chroot");
+					newChangeowner = doc.createElement("changeowner");
+					newCOuser = doc.createElement("user");
+					newCOgroup = doc.createElement("group");
+					newChText = doc.createTextNode("0");
+					newCOuserText = doc.createTextNode("mediacp");
+					newCOgroupText = doc.createTextNode("mediacp");
+					newCOuser.appendChild(newCOuserText);
+					newCh.appendChild(newChText);
+					newCOgroup.appendChild(newCOgroupText);
+					newSec.appendChild(newCh);
+					newSec.appendChild(newChangeowner);
+					newChangeowner.appendChild(newCOuser);
+					newChangeowner.appendChild(newCOgroup);
+					icecast[0].appendChild(newSec);
+				}
 				
 				console.info('new node', mount[0].firstChild.nodeValue);
 				console.info('doc after change', serializer.serializeToString(doc));

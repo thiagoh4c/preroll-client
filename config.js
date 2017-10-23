@@ -6,7 +6,7 @@ var settings = {
   defaultWebfolder:    '/usr/share/icecast2/web/',
   defaultConfigfolder: '/etc/icecast2/admin/',
   defaulLogfolder:     '/var/log/icecast2/',
-  serverUrl:           'preroll.crosshost.com.br',
+  serverUrl:           'localhost',
   hostname:            'preroll.crosshost.com.br'
 };
 
