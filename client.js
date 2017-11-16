@@ -281,11 +281,6 @@ socket.on('logs', function (data) {
 
 								info["ip"] = info["ip"] == '127.0.0.1' ? '189.78.174.121' : info.ip;
 
-								console.log(info);
-								return;
-
-
-
 								var res = {
 									id: 	  dataDb.id, 
 									ip: 	  info["ip"],
