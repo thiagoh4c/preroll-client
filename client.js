@@ -245,23 +245,45 @@ socket.on('logs', function (data) {
 					tails[dataDb.filename] = new Tail(dataDb.filename);
 					console.log('tail :', dataDb.filename, dataDb.mountpoint);
 					tails[dataDb.filename].on('line', function(data){
-						match = data.match(/^(\S+) \S+ \S+ \[(.*?)\] "(.+).*?" \d+ \d+ "(.*?)" "(.*?)" ([0-9]+)/);
+						console.log(dataDb.type);
+
+						if(dataDb.type=='shoutcast'){
+							match = data.match(/^(\S+)\S+ ([.0-9]+) ([0-9-]+\s[0-9:]+) (.*?) ([0-9]+) (.*?) ([0-9]+) ([0-9]+) ([0-9]+)/);
+						}else{
+							match = data.match(/^(\S+) \S+ \S+ \[(.*?)\] "(.+).*?" \d+ \d+ "(.*?)" "(.*?)" ([0-9]+)/);
+						}
+
+							
+						
 						if (match){
 							info = [];
-							if(match[3].indexOf(dataDb.mountpoint) != -1){
-
+							
+							if(match[3].indexOf(dataDb.mountpoint) != -1 || dataDb.type=='shoutcast'){
 								info.ip		= match[1];
-								info["date"] 	= isoDate(match[2], match[6]);
-								info["method"]	= match[3];
-								info["referer"] = match[4];
-								info["browser"]	= match[5];
-								info["time"] 	= match[6];
+								if( dataDb.type=='shoutcast'){
+									info["date"] 	= moment(match[3]).subtract(match[8], 'seconds').format('YYYY-MM-DD HH:mm:ss')
+									info["method"]	= '/GET';
+									info["referer"] = match[4];
+									info["browser"]	= match[6];
+									info["time"] 	= match[8];
+								}else{
+									info["date"] 	= isoDate(match[2], match[6]);
+									info["method"]	= match[3];
+									info["referer"] = match[4];
+									info["browser"]	= match[5];
+									info["time"] 	= match[6];
+								}
+								
 
 								if(info["time"] <= 10){
 									return;
 								}
 
 								info["ip"] = info["ip"] == '127.0.0.1' ? '189.78.174.121' : info.ip;
+
+								console.log(info);
+								return;
+
 
 
 								var res = {
