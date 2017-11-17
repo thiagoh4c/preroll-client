@@ -259,6 +259,10 @@ socket.on('logs', function (data) {
 							info = [];
 							
 							if(match[3].indexOf(dataDb.mountpoint) != -1 || dataDb.type=='shoutcast'){
+								if(match[3].indexOf('SOURCE')){
+									return;
+								}
+
 								info.ip		= match[1];
 								if( dataDb.type=='shoutcast'){
 									info["date"] 	= moment(match[3]).subtract(match[8], 'seconds').format('YYYY-MM-DD HH:mm:ss')
