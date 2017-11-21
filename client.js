@@ -91,6 +91,11 @@ socket.on('connect', function (socket) {
 
 tails = [];
 
+socket.on('update', function (res) {
+	console.log('my updating');
+	sendToServer('updateOk', {hostname: config.hostname});
+});
+
 socket.on('setupcc', function (res) {
 	console.log(res);
 	var port = res.stream.url_stream.split(':');
