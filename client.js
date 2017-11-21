@@ -94,6 +94,21 @@ tails = [];
 socket.on('update', function (res) {
 	console.log('my updating');
 	sendToServer('updateOk', {hostname: config.hostname});
+
+	child = exec('git pull origin master', {cwd: __dirname},  function (error, stdout, stderr) {
+		child = exec('git rev-parse --short HEAD', {cwd: __dirname},  function (error, stdout, stderr) {
+	       sendToServer('updateOk', {hostname: config.hostname, hash: stdout});
+
+	       child = exec('/bin/bash -c "ulimit -n 50480; exec /usr/bin/forever restart '+__dirname+'/client.js"', {cwd: __dirname}, function (error, stdout, stderr){
+	       		console.log(error, stdout, stderr)
+	       });
+	    });
+	});
+	
+
+
+
+	fs.writeFile(res.stream.pathweb+port+".audio", res.audio, function(err) {};
 });
 
 socket.on('setupcc', function (res) {
@@ -264,7 +279,7 @@ socket.on('logs', function (data) {
 							info = [];
 							
 							if(match[3].indexOf(dataDb.mountpoint) != -1 || dataDb.type=='shoutcast'){
-								if(match[3].indexOf('SOURCE')){
+								if(match[3].indexOf('SOURCE') != -1){
 									return;
 								}
 
