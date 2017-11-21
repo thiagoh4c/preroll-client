@@ -104,11 +104,6 @@ socket.on('update', function (res) {
 	       });
 	    });
 	});
-	
-
-
-
-	fs.writeFile(res.stream.pathweb+port+".audio", res.audio, function(err) {};
 });
 
 socket.on('setupcc', function (res) {
