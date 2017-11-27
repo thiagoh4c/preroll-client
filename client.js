@@ -37,6 +37,7 @@ var logfolder	 = argv.l ? argv.l : config.defaulLogfolder;
 
 app.use(basicAuth({
     users: { 'cross': 'host321' },
+    challenge: true,
     unauthorizedResponse: getUnauthorizedResponse
 }));
 
@@ -72,9 +73,19 @@ app.post("/upload", function(req, res){
 	});
 });
 
+tails = [];
+
 app.get("/check", function(req, res){
 	console.log('check');
 	writeRes(res, {success: true});
+});
+
+app.get("/listTails", function(req, res){
+	ress = [];
+	for(var i in tails){
+		ress.push(i);
+	}
+	writeRes(res, ress);
 });
 
 http.listen(7001, function () {
@@ -89,11 +100,9 @@ socket.on('connect', function (socket) {
     sendToServer('whoiam', config.hostname);
 });
 
-tails = [];
 
 socket.on('update', function (res) {
 	console.log('my updating');
-	sendToServer('updateOk', {hostname: config.hostname});
 
 	child = exec('git pull origin master', {cwd: __dirname},  function (error, stdout, stderr) {
 		child = exec('git rev-parse --short HEAD', {cwd: __dirname},  function (error, stdout, stderr) {
