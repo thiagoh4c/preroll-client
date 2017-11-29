@@ -301,7 +301,7 @@ socket.on('logs', function (data) {
 								}
 								
 
-								if(info["time"] <= 10){
+								if(info["time"] <= 35){
 									return;
 								}
 
