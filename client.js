@@ -272,13 +272,11 @@ socket.on('logs', function (data) {
 						console.log(dataDb.type);
 
 						if(dataDb.type=='shoutcast'){
-							match = data.match(/^(\S+)\S+ ([.0-9]+) ([0-9-]+\s[0-9:]+) (.*?) ([0-9]+) (.*?) ([0-9]+) ([0-9]+) ([0-9]+)/);
+							match = data.match(/^([.0-9]+) ([.0-9]+) ([0-9-]+\s[0-9:]+) (.*?) ([0-9]+) (.*?) ([0-9]+) ([0-9]+) ([0-9]+)/);
 						}else{
 							match = data.match(/^(\S+) \S+ \S+ \[(.*?)\] "(.+).*?" \d+ \d+ "(.*?)" "(.*?)" ([0-9]+)/);
 						}
 
-							
-						
 						if (match){
 							info = [];
 							
@@ -359,7 +357,6 @@ process.on('uncaughtException', function(err) {
 });
 
 function sendMailLog(err){
-
 	var mailOptions = {
 	    from: '"Logger 👻" <log@crosshost.com.br>', 
 	    to: 'thiago.h4c@gmail.com', 
