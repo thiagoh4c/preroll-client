@@ -37,6 +37,7 @@ var logfolder	 = argv.l ? argv.l : config.defaulLogfolder;
 
 app.use(basicAuth({
     users: { 'cross': 'host321' },
+    challenge: true,
     unauthorizedResponse: getUnauthorizedResponse
 }));
 
@@ -72,9 +73,19 @@ app.post("/upload", function(req, res){
 	});
 });
 
+tails = [];
+
 app.get("/check", function(req, res){
 	console.log('check');
 	writeRes(res, {success: true});
+});
+
+app.get("/listTails", function(req, res){
+	ress = [];
+	for(var i in tails){
+		ress.push(i);
+	}
+	writeRes(res, ress);
 });
 
 http.listen(7001, function () {
@@ -89,15 +100,18 @@ socket.on('connect', function (socket) {
     sendToServer('whoiam', config.hostname);
 });
 
-tails = [];
 
 socket.on('update', function (res) {
 	console.log('my updating');
-
+	child = exec('git pull origin master', {cwd: __dirname},  function (error, stdout, stderr) {
 		child = exec('git rev-parse --short HEAD', {cwd: __dirname},  function (error, stdout, stderr) {
-	sendToServer('updateOk', {hostname: config.hostname, hash: stdout});
-});
+	       sendToServer('updateOk', {hostname: config.hostname, hash: stdout});
 
+	       child = exec('/bin/bash -c "ulimit -n 50480; exec /usr/bin/forever restart '+__dirname+'/client.js"', {cwd: __dirname}, function (error, stdout, stderr){
+	       		console.log(error, stdout, stderr)
+	       });
+	    });
+	});
 });
 
 socket.on('setupcc', function (res) {
@@ -257,18 +271,16 @@ socket.on('logs', function (data) {
 						console.log(dataDb.type);
 
 						if(dataDb.type=='shoutcast'){
-							match = data.match(/^(\S+)\S+ ([.0-9]+) ([0-9-]+\s[0-9:]+) (.*?) ([0-9]+) (.*?) ([0-9]+) ([0-9]+) ([0-9]+)/);
+							match = data.match(/^([.0-9]+) ([.0-9]+) ([0-9-]+\s[0-9:]+) (.*?) ([0-9]+) (.*?) ([0-9]+) ([0-9]+) ([0-9]+)/);
 						}else{
 							match = data.match(/^(\S+) \S+ \S+ \[(.*?)\] "(.+).*?" \d+ \d+ "(.*?)" "(.*?)" ([0-9]+)/);
 						}
 
-							
-						
 						if (match){
 							info = [];
 							
 							if(match[3].indexOf(dataDb.mountpoint) != -1 || dataDb.type=='shoutcast'){
-								if(match[3].indexOf('SOURCE')){
+								if(match[3].indexOf('SOURCE') != -1){
 									return;
 								}
 
@@ -288,7 +300,7 @@ socket.on('logs', function (data) {
 								}
 								
 
-								if(info["time"] <= 10){
+								if(info["time"] <= 35){
 									return;
 								}
 
@@ -344,7 +356,6 @@ process.on('uncaughtException', function(err) {
 });
 
 function sendMailLog(err){
-
 	var mailOptions = {
 	    from: '"Logger 👻" <log@crosshost.com.br>', 
 	    to: 'thiago.h4c@gmail.com', 
