@@ -114,6 +114,12 @@ socket.on('update', function (res) {
 	});
 });
 
+socket.on('restart', function (res) {
+   child = exec('/bin/bash -c "ulimit -n 50480; exec /usr/bin/forever restart '+__dirname+'/client.js"', {cwd: __dirname}, function (error, stdout, stderr){
+   		console.log(error, stdout, stderr)
+   });
+});
+
 socket.on('setupcc', function (res) {
 	console.log(res);
 	var port = res.stream.url_stream.split(':');
