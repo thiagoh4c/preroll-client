@@ -116,7 +116,7 @@ socket.on('update', function (res) {
 
 socket.on('restart', function (res) {
 	console.log('restarting =====================================');
-   child = exec('/bin/bash -c "ulimit -n 50480; exec /usr/bin/forever restart '+__dirname+'/client.js"', {cwd: __dirname}, function (error, stdout, stderr){
+   child = exec('/bin/bash -c "ulimit -n 50480; exec forever restart '+__dirname+'/client.js"', {cwd: __dirname}, function (error, stdout, stderr){
    		console.log(error, stdout, stderr)
    });
 });
