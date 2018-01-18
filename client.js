@@ -93,7 +93,11 @@ tails = [];
 
 socket.on('update', function (res) {
 	console.log('my updating');
-	sendToServer('updateOk', {hostname: config.hostname});
+
+		child = exec('git rev-parse --short HEAD', {cwd: __dirname},  function (error, stdout, stderr) {
+	sendToServer('updateOk', {hostname: config.hostname, hash: stdout});
+});
+
 });
 
 socket.on('setupcc', function (res) {
